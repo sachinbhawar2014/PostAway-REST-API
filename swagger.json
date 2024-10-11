@@ -1,0 +1,760 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "description": "API documentation for Postaway, a Social Media APP.",
+    "title": "Postaway-II API",
+    "contact": {
+      "name": "Sachin Bhawar",
+      "email": "sachinbhavar@gmail.com",
+      "url": "https://www.linkedin.com/in/sachin-bhawar/"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3600"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "JWT": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "JWT token to be included in the 'Authorization' header in the format 'Bearer token'."
+      }
+    }
+  },
+  "paths": {
+    "/api/users/signup": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Register a new user.",
+        "description": "Allows users to register by providing their name, email, password and gender.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" },
+                  "gender": { "type": "string", "enum": ["Male", "Female", "Other"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User registered successfully." },
+          "400": { "description": "Valid Name email password and gender required" },
+          "409": { "description": "Email is already registered." }
+        }
+      }
+    },
+
+    "/api/users/signin": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Sign in to the application.",
+        "description": "Allows users to sign in and receive a token to authenticate subsequent requests.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Signin successful. Token returned." },
+          "401": { "description": "Invalid credentials." },
+          "404": { "description": "This email is not registered" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/users/logout": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Logout From to the application.",
+        "description": "Allows users logout.",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Logged out successfully." },
+          "500": { "description": "An error occurred during logout." }
+        }
+      }
+    },
+
+    "/api/users/get-details/{userId}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get Details of a user.",
+        "description": "Allows users get details of User by providing its userId.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of the User to retrieve.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "User Data fetched successfully" },
+          "400": { "description": "Invalid userId" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/users/get-all-details": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get Details of all users.",
+        "description": "Allows users get details of all users.",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "All Users Data fetched successfully" },
+          "404": { "description": "Users not found" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/users/update-details": {
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update Details of a loggedin user.",
+        "description": "Allows users update his/her details. UserId is fetched from login details.",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "about": { "type": "string" },
+                  "profileImage": { "type": "file", "format": "binary" },
+                  "city": { "type": "string" },
+                  "education": { "type": "string" },
+                  "dateOfBirth": { "type": "string" },
+                  "relationshipStatus": {
+                    "type": "string",
+                    "enum": ["Single", "Married", "In a relationship", "It's complicated"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "All Users Data fetched successfully" },
+          "404": { "description": "Users not found" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/posts/all": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Retrieve all posts from registered users",
+        "description": "Retrieve all posts from all users.",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "All Posts retrieved successfully" },
+          "404": { "description": "No posts found." },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/posts": {
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Create a new post with image upload functionality.",
+        "description": "Create a new post with image upload functionality.",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "caption": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "file",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Post created successfully." },
+          "400": { "description": "Caption is required / Image is required" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      },
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Retrieve posts for logged-in user.",
+        "description": "Retrieve all posts associated with the authenticated user.",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "All Posts of Logged-in user retrieved successfully" },
+          "404": { "description": "No post found." },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/posts/{postId}": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Retrieve a specific post by its ID.",
+        "description": "Retrieve a specific post by providing its ID.",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "ID of the post to retrieve.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Post retrieved successfully." },
+          "400": { "description": "Invalid postId" },
+          "404": { "description": "Post not found." },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      },
+      "delete": {
+        "tags": ["Posts"],
+        "summary": "Delete a specific post by its ID.",
+        "description": "Delete the specific post identified by its ID.",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "ID of the post to delete.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Post deleted successfully." },
+          "400": { "description": "Invalid postId." },
+          "404": { "description": "Post not found." },
+          "401": { "description": "You are unauthorized to delete this Post." },
+          "500": { "description": "Something went wrong while working with database." }
+        }
+      },
+      "put": {
+        "tags": ["Posts"],
+        "summary": "Update a specific post by its ID.",
+        "description": "Update the specific post identified by its ID with image upload functionality.",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "ID of the post to update.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newCaption": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "file",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Post updated successfully." },
+          "400": { "description": "Invalid postId." },
+          "404": { "description": "Post not found." },
+          "401": { "description": "You are unauthorized to update this Post." },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/comments/{postId}": {
+      "get": {
+        "tags": ["Comments"],
+        "summary": "Retrieve all comments for a post",
+        "description": "This endpoint retrieves all comments associated with the post identified by its ID.",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "ID of the post.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "All comments on this post retrieved successfully" },
+          "400": { "description": "Invalid postId." },
+          "404": { "description": "Post not found. / No comments found" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      },
+      "post": {
+        "tags": ["Comments"],
+        "summary": "Add new comments for a post",
+        "description": "This endpoint adds new comment associated with the post identified by its ID.",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "ID of the post.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "commentText": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Comment created successfully" },
+          "400": { "description": "Invalid postId." },
+          "404": { "description": "Post not found." },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/comments/{commentId}": {
+      "put": {
+        "tags": ["Comments"],
+        "summary": "Update comment for a post",
+        "description": "This endpoint updates existing comment of logged-in user .",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "ID of the comment.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newComment": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Comment updated successfully" },
+          "400": { "description": "Invalid commentId." },
+          "401": { "description": "Not Authorised to delete this Comment" },
+          "404": { "description": "Comment not found." },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      },
+      "delete": {
+        "tags": ["Comments"],
+        "summary": "Delete existing comments for a post",
+        "description": "This endpoint deletes existing comment. The Post Owner or comment owner are authorized to delete.",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "ID of the comment.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Comment deleted successfully" },
+          "400": { "description": "Invalid commentId." },
+          "401": { "description": "Not Authorised to delete this Comment" },
+          "404": { "description": "Comment not found." },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/likes/{id}": {
+      "get": {
+        "tags": ["Likes"],
+        "summary": "Retrieve all Likes for a post or comment",
+        "description": "This endpoint retrieves all likes associated with the post or comment identified by its ID.",
+        "parameters": [
+          {
+            "name": "postId Or CommentId",
+            "in": "path",
+            "description": "ID of the post.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Likes on Post/Comment:   " },
+          "400": { "description": "Invalid postId Or Comment Id" },
+          "404": { "description": "No Post or Comment found" },
+          "500": { "description": "Error occured while fetching likes please try again later" }
+        }
+      }
+    },
+
+    "/api/likes/toggle/{id}": {
+      "get": {
+        "tags": ["Likes"],
+        "summary": "Toggle Like for a post or comment",
+        "description": "This endpoint toggles like associated with the post or comment identified by its ID.",
+        "parameters": [
+          {
+            "name": "postId Or CommentId",
+            "in": "path",
+            "description": "ID of the post.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Post/Comment Liked/Like toggled successfully" },
+          "400": { "description": "Invalid postId Or Comment Id" },
+          "404": { "description": "No Post or Comment found" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/friends/get-friends/{userId}": {
+      "get": {
+        "tags": ["Friendship"],
+        "summary": "Get friends of a user.",
+        "description": "Allows users get friends data of User by providing its userId.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of the User whos friends list is to retrieve.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "All friends of user retrieved successfully" },
+          "400": { "description": "Invalid userId" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/friends/get-pending-requests": {
+      "get": {
+        "tags": ["Friendship"],
+        "summary": "Get pending friend requests.",
+        "description": "Allows users get pending friend requests.",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Pending friend request fetched successfully" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/friends/toggle-friendship/{friendId}": {
+      "post": {
+        "tags": ["Friendship"],
+        "summary": "Toggle friendship with friend of a user.",
+        "description": "Toggle friendship method allows users unfriend if friendship exist between user and friend, if no friendship exists and friend has sent friend request then accept that friend request. if no friendship exists and user has not received the friend request from that friend then user sends friend request from his/her end to the friend. If friend request is already sent but friend has not yet accepted then cancel friend request. Friend is identified by his/her id",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "friendId",
+            "in": "path",
+            "description": "Id of the User/friend with whom friendship is to toggle",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Pending friend request fetched successfully" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/friends/response-to-request/{friendId}": {
+      "put": {
+        "tags": ["Friendship"],
+        "summary": "Respond friendship method accepts or rejects friendship.",
+        "description": "Respond friendship method allows users accept/reject friendship.",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "friendId",
+            "in": "path",
+            "description": "Id of the User/friend with whom friendship is to toggle",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "response": { "type": "string", "enum": ["accept", "reject"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Friend request accepted/deleted successfully" },
+          "400": { "description": "Response must be accepted or rejected. please enter correct value in res.body" },
+          "410": { "description": "Friend request might have withdrawn" },
+          "500": { "description": "Something went wrong while working with database" }
+        }
+      }
+    },
+
+    "/api/otp/send": {
+      "post": {
+        "tags": ["OTP"],
+        "summary": "Send Otp for reseting password.",
+        "description": "This endpoint sends otp for reseting the password. OTP is 6 digit and valid for 60 sec.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "OTP sent successfully" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Failed to send OTP" }
+        }
+      }
+    },
+
+    "/api/otp/verify": {
+      "post": {
+        "tags": ["OTP"],
+        "summary": "Verifies the Otp sent on email of the user.",
+        "description": "This endpoint verifies otp for reseting the password. OTP is 6 digit and valid for 60 sec.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "otp": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OTP verified successfully" },
+          "400": { "description": "Invalid OTP or OPT expired" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Error verifying otp" }
+        }
+      }
+    },
+
+    "/api/otp/reset-password": {
+      "post": {
+        "tags": ["OTP"],
+        "summary": "Reset password for the already registered user.",
+        "description": "This endpoint resets password  ting the password. OTP is 6 digit and valid for 60 sec.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "newPassoword": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password updated successfully" },
+          "400": { "description": "Invalid OTP or OPT expired" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Error updating password" }
+        }
+      }
+    }
+  }
+}
