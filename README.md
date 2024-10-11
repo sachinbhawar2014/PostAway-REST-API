@@ -1,8 +1,10 @@
-🌟 Post Away API
-Overview
+**🌟 Post Away API**
+
+**Overview**
 Welcome to the Post Away API! 🚀 This RESTful web service is designed for a social media platform that allows users to register, log in, create posts, comment on posts, and manage friendships. Built with Node.js and Express, this API provides seamless integration with front-end applications and offers efficient data management using MongoDB. 📱💬
 
-Features
+**Features**
+
 User Management
 User Registration: Create a new account! (/api/users/signup) 📝
 User Login: Securely log in to your account! (/api/users/signin) 🔑
